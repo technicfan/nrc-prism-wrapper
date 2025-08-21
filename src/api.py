@@ -145,14 +145,10 @@ async def join_server_session(
 ) -> None:
     """
     Join a Minecraft server session
-    
     Args:
         access_token: Minecraft access token
         selected_profile: UUID of the selected profile
         server_id: Server ID to join
-    
-    Raises:
-        Exception: If the API request fails
     """
     logger.debug(
         f"API call: join_server_session for profile: {selected_profile} server_id: {server_id}"
@@ -181,7 +177,6 @@ async def join_server_session(
             
             logger.debug(f"Received response with status: {response.status_code}")
 
-            # Check if successful (should return 204 No Content on success)
             if not response.is_success:
                 error_text = response.text
                 logger.debug(f"Join server session failed: {error_text}")

@@ -14,7 +14,7 @@ async def is_token_expired(token):
     decoded = jwt.decode(
              token_byte,
             options={"verify_signature": False},
-            algorithms=["HS256", "none"]  # Include the expected algorithm
+            algorithms=["HS256", "none"]
         )
     exp_time = decoded.get('exp')
     current_time = time.time()
