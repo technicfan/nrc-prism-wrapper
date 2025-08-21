@@ -2,6 +2,7 @@
 
 
 
+import uuid
 from venv import logger
 
 import httpx
@@ -9,6 +10,113 @@ import httpx
 
 MOJANG_SESSION_URL = "https://sessionserver.mojang.com"
 NORISK_API_URL = "https://api.norisk.gg/api/v1"
+
+
+
+async def exchange_microsoft_for_minecraft_token(microsoft_access_token: str) -> tuple[str, str]:
+    """
+    Exchange Microsoft access token for Minecraft access token and profile UUID
+    
+    Returns:
+        tuple: (minecraft_access_token, player_uuid)
+    """
+    async with httpx.AsyncClient() as client:
+        # Step 1: Authenticate with Xbox Live
+        xbox_auth_url = "https://user.auth.xboxlive.com/user/authenticate"
+        
+        xbox_payload = {
+            "Properties": {
+                "AuthMethod": "RPS",
+                "SiteName": "user.auth.xboxlive.com",
+                "RpsTicket": f"d={microsoft_access_token}"
+            },
+            "RelyingParty": "http://auth.xboxlive.com",
+            "TokenType": "JWT"
+        }
+        
+        xbox_response = await client.post(
+            xbox_auth_url,
+            json=xbox_payload,
+            headers={"Content-Type": "application/json"}
+        )
+        xbox_response.raise_for_status()
+        xbox_data = xbox_response.json()
+        xbox_token = xbox_data["Token"]
+        user_hash = xbox_data["DisplayClaims"]["xui"][0]["uhs"]
+
+        # Step 2: Get XSTS token (Xbox Secure Token Service)
+        xsts_url = "https://xsts.auth.xboxlive.com/xsts/authorize"
+        
+        xsts_payload = {
+            "Properties": {
+                "SandboxId": "RETAIL",
+                "UserTokens": [xbox_token]
+            },
+            "RelyingParty": "rp://api.minecraftservices.com/",
+            "TokenType": "JWT"
+        }
+        
+        xsts_response = await client.post(
+            xsts_url,
+            json=xsts_payload,
+            headers={"Content-Type": "application/json"}
+        )
+        xsts_response.raise_for_status()
+        xsts_data = xsts_response.json()
+        xsts_token = xsts_data["Token"]
+
+        # Step 3: Authenticate with Minecraft Services
+        mc_auth_url = "https://api.minecraftservices.com/authentication/login_with_xbox"
+        
+        mc_payload = {
+            "identityToken": f"XBL3.0 x={user_hash};{xsts_token}"
+        }
+        
+        mc_response = await client.post(
+            mc_auth_url,
+            json=mc_payload,
+            headers={"Content-Type": "application/json"}
+        )
+        mc_response.raise_for_status()
+        mc_data = mc_response.json()
+        minecraft_access_token = mc_data["access_token"]
+
+        # Step 4: Get Minecraft profile (to get UUID)
+        profile_url = "https://api.minecraftservices.com/minecraft/profile"
+        
+        profile_response = await client.get(
+            profile_url,
+            headers={"Authorization": f"Bearer {minecraft_access_token}"}
+        )
+        profile_response.raise_for_status()
+        profile_data = profile_response.json()
+        player_uuid = profile_data["id"]
+
+        return minecraft_access_token, player_uuid
+
+async def validate_with_norisk_api(username,server_id):
+    url = f"{NORISK_API_URL}/launcher/auth/validate/v2"
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(
+                url,
+                params={
+                    "force": False,
+                    "hwid": uuid.uuid4(),
+                    "username": username,
+                    "server_id": server_id
+                }
+            )
+            if not response.is_success:
+                error_text = response.text
+                logger.debug(f"failed to validate server join with norisk api: {error_text}")
+                raise Exception(f"failed to validate server join with norisk api: {error_text}")
+            
+            return response.json()
+            
+        except httpx.RequestError as e:
+            logger.debug(f"API request failed: {e}")
+            raise Exception(f"Norisk API request failed: {e}")
 
 
 async def request_server_id():
