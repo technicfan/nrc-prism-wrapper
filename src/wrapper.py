@@ -47,7 +47,6 @@ def main():
     print(f"Executing: {' '.join(new_cmd)}", file=sys.stderr)
     
     # Execute the final, modified command
-    return 0
     try:
         os.execvp(new_cmd[0], new_cmd)
     except FileNotFoundError:
