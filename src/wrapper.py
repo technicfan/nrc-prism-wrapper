@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+import asyncio
 import os
 import sys
 import subprocess
 from shutil import which
+import get_token
 
 # Wrapper script for the NoRisk instance.
 # Prism Launcher will call this script with the original Java command as arguments.
@@ -10,7 +12,7 @@ from shutil import which
 
 def main():
     # Check if the token is set. Exit with an error if it's not.
-    token = os.environ.get('NORISK_TOKEN')
+    token = asyncio.run(get_token.main())
     if not token:
         print("ERROR: The NORISK_TOKEN environment variable is not set.", file=sys.stderr)
         sys.exit(1)
@@ -45,6 +47,7 @@ def main():
     print(f"Executing: {' '.join(new_cmd)}", file=sys.stderr)
     
     # Execute the final, modified command
+    return 0
     try:
         os.execvp(new_cmd[0], new_cmd)
     except FileNotFoundError:

@@ -111,8 +111,7 @@ async def validate_with_norisk_api(username,server_id):
                 error_text = response.text
                 logger.debug(f"failed to validate server join with norisk api: {error_text}")
                 raise Exception(f"failed to validate server join with norisk api: {error_text}")
-            
-            return response.json()
+            return response.json().get("value")
             
         except httpx.RequestError as e:
             logger.debug(f"API request failed: {e}")
