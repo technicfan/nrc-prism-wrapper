@@ -26,11 +26,6 @@ async def parse_version(version_string):
         if first_dot == -1:
             raise ValueError("Invalid version format")
         mc_version = mc_part[first_dot + 1:]
-    print({
-        'mod_version': mod_version,
-        'mc_version': mc_version,
-        "original":version_string
-    })
     return {
         'mod_version': mod_version,
         'mc_version': mc_version,
@@ -57,6 +52,11 @@ async def process_artifact(remote_artifact,installed_artifacts):
 
     if matches:
         installed_version = matches[0].get("version")
+        # owo lib version format workaround
+        if "+" in installed_version:
+            parsed = await parse_version(installed_version)
+            installed_version = parsed.get("mod_version")
+        
         filename = matches[0].get("filename")
         if newest_version.get("mod_version") != installed_version:
             print("NEW;",newest_version.get("mod_version"))
