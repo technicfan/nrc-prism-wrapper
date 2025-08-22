@@ -3,3 +3,4 @@ httpx
 uuid
 json
 aiofiles
+packaging

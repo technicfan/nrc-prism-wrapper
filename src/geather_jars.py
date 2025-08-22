@@ -5,7 +5,7 @@ import zipfile
 
 import aiofiles
 import networking.maven as maven
-
+from packaging import version
 
 async def get_mc_version():
     with open("../mmc-pack.json") as f:
@@ -15,22 +15,45 @@ async def get_mc_version():
                 return component.get("version")
 
 async def parse_version(version_string):
-    if '+' not in version_string:
-        raise ValueError("Invalid version format")
-    mod_version, mc_part = version_string.split('+', 1)
-    
-    if mc_part[0].isdigit():
-        mc_version = mc_part
-    else:
-        first_dot = mc_part.find('.')
-        if first_dot == -1:
-            raise ValueError("Invalid version format")
-        mc_version = mc_part[first_dot + 1:]
-    return {
-        'mod_version': mod_version,
-        'mc_version': mc_version,
-        "original":version_string
+    result = {
+        'mod_version': None,
+        'mc_version': None,
+        'original': version_string
     }
+    
+    # Handle format: 1.21-1.0.14 (mc_version-mod_version)
+    if '-' in version_string and '+' not in version_string:
+        mc_version, mod_version = version_string.split('-', 1)
+        result['mod_version'] = mod_version
+        result['mc_version'] = mc_version
+        return result
+    
+    # Handle format: 1.0.30+fabric.1.21.8 (mod_version+fabric.mc_version)
+    elif '+fabric.' in version_string:
+        mod_version, fabric_part = version_string.split('+fabric.', 1)
+        result['mod_version'] = mod_version
+        result['mc_version'] = fabric_part
+        return result
+    
+    # Handle format: 0.12.23+1.21.6 (mod_version+mc_version)
+    elif '+' in version_string:
+        mod_version, mc_part = version_string.split('+', 1)
+        
+        # Check if the mc_part starts with a digit (direct version)
+        if mc_part[0].isdigit():
+            result['mod_version'] = mod_version
+            result['mc_version'] = mc_part
+            return result
+        else:
+            # Handle other potential prefixes (like "forge.", "quilt.", etc.)
+            first_dot = mc_part.find('.')
+            if first_dot == -1:
+                raise ValueError(f"Invalid version format: {version_string}")
+            result['mod_version'] = mod_version
+            result['mc_version'] = mc_part[first_dot + 1:]
+            return result
+    
+    raise ValueError(f"Invalid version format: {version_string}")
 
 
 
@@ -43,6 +66,7 @@ async def process_artifact(remote_artifact,installed_artifacts):
         if parsed_version.get("mc_version") == target_mc:
             filtered_versions.append(parsed_version)
 
+    print(filtered_versions)
     newest_version = filtered_versions[-1]
     matches = []
     # get installed versions
@@ -115,49 +139,32 @@ async def get_installed_versions(artifacts):
             continue
     return installed_artifacts
 
+
+async def get_repos(mc_version):
+    repos = []
+    with open("src/data/repos.json","r") as f:
+        raw = json.load(f)
+    for repo in raw:
+        if await is_version_compatible(mc_version,repo.get("versions")):
+            repos.append(repo)
+    return repos
+
+async def is_version_compatible(target_version:str, constraint:str):
+    print(target_version)
+    current_version = version.parse(target_version)
+    min_version = version.parse(constraint.strip("=><"))
+    
+    if constraint.startswith('>='):
+        return current_version >= min_version
+    if constraint.startswith('<='):
+        return current_version <= min_version
+    if constraint.startswith('=='):
+        return current_version == min_version
+    
+    return False
+
 async def main():
-    artifacts = [
-        {
-            "name":"nrc-core",
-            "group":"gg.norisk"
-        },
-        {
-            "name":"nrc-ui",
-            "group":"gg.norisk"
-        },
-        {
-            "name":"nrc-client",
-            "group":"gg.norisk"
-        },
-        {
-            "name":"nrc-cosmetics",
-            "group":"gg.norisk"
-        },
-        {
-            "name":"nrc-friends",
-            "group":"gg.norisk"
-        },
-        {
-            "name":"nrc-mcreal",
-            "group":"gg.norisk"
-        },
-        {
-            "name":"nrc-minigames",
-            "group":"gg.norisk"
-        },
-        {
-            "name":"nrc-emotes",
-            "group":"gg.norisk"
-        },
-        {
-            "name":"nrc-voicechat",
-            "group":"gg.norisk"
-        },
-        {
-            "name":"owo-lib",
-            "group":"io.wispforest"
-        }
-    ]
+    artifacts = await get_repos(await get_mc_version())
 
     maven_tasks = []
 
@@ -174,4 +181,4 @@ async def main():
         if args:
             maven_download.append(update_maven_jar(args.get("new_version"),args.get("artifact"),args.get("old_file")))
 
-    r = await asyncio.gather(*maven_download)
+    await asyncio.gather(*maven_download)
