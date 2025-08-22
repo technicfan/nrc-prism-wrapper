@@ -1,2 +1,4 @@
 accounts.json
 src/__pycache__/*
+mod/*
+NoRiskClient/*

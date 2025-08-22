@@ -1,17 +1,71 @@
-
-
-
-
+import asyncio
+import hashlib
+import os
+from pathlib import Path
+from typing import Dict
 import uuid
 from venv import logger
 
+import aiofiles
+import aiohttp
 import httpx
-
-
+ASSET_PATH = "NoRiskClient/assets"
 MOJANG_SESSION_URL = "https://sessionserver.mojang.com"
 NORISK_API_URL = "https://api.norisk.gg/api/v1"
+        
+async def download_single_asset(asset_id: str, path: str, asset_info: Dict,norisk_token: str, semaphore: asyncio.Semaphore) -> None:
+        """Download a single asset file"""
+        async with semaphore:
+            try:
+                path_obj = Path(path)
+                dir_path = path_obj.parent
+                #filename = path_obj.name
+                os.makedirs(f"{ASSET_PATH}/{dir_path}", exist_ok=True)
+                
+                # Download from CDN
+                url = f"https://cdn.norisk.gg/assets/{asset_id}/assets/{path}"
+                headers = {"Authorization": f"Bearer {norisk_token}"}
+                
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url, headers=headers) as response:
+                        if response.status == 200:
+                            content = await response.read()
+                            
+                            # Verify hash
+                            downloaded_hash = hashlib.md5(content).hexdigest()
+                            if downloaded_hash != asset_info.get("hash"):
+                                raise ValueError(f"Hash mismatch for {path}")
+                                
+                            # Save file
+                            async with aiofiles.open(f"{ASSET_PATH}/{path}", "wb") as f:
+                                await f.write(content)
+                                
+                        else:
+                            raise Exception(f"Failed to download {path}: {response.status}")
+                            
+            except Exception as e:
+                print(f"Error downloading {path}: {e} URL:{url}")
+                raise
 
 
+
+async def get_asset_metadata(nrc_token,asset_id):
+    url = f"https://api.norisk.gg/api/v1/launcher/pack/{asset_id}"
+    headers = {
+            "Authorization": f"Bearer {nrc_token}",
+            "Content-Type": "application/json"
+        }
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(url, headers=headers) as response:
+                if response.status == 200:
+                    return await response.json()
+                else:
+                    print(f"Failed to fetch assets: {response.status}")
+                    return {}
+        except Exception as e:
+            print(f"Error fetching assets: {e}")
+            return {}
 
 async def exchange_microsoft_for_minecraft_token(microsoft_access_token: str) -> tuple[str, str]:
     """

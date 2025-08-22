@@ -4,6 +4,7 @@ import os
 import sys
 from shutil import which
 import get_token
+import get_assets
 
 # Wrapper script for the NoRisk instance.
 # Prism Launcher will call this script with the original Java command as arguments.
@@ -15,6 +16,8 @@ def main():
     if not token:
         print("ERROR: Missing Norisk token", file=sys.stderr)
         sys.exit(1)
+
+    asyncio.run(get_assets.main(token))
 
     # Get the original command arguments
     original_args = sys.argv[1:]
