@@ -5,6 +5,7 @@ import sys
 from shutil import which
 import get_token
 import get_assets
+import geather_jars
 
 # Wrapper script for the NoRisk instance.
 # Prism Launcher will call this script with the original Java command as arguments.
@@ -18,6 +19,7 @@ def main():
         sys.exit(1)
 
     asyncio.run(get_assets.main(token))
+    asyncio.run(geather_jars.main())
 
     # Get the original command arguments
     original_args = sys.argv[1:]

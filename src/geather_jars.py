@@ -175,9 +175,3 @@ async def main():
             maven_download.append(update_maven_jar(args.get("new_version"),args.get("artifact"),args.get("old_file")))
 
     r = await asyncio.gather(*maven_download)
-
-
-
-
-
-asyncio.run(main())
