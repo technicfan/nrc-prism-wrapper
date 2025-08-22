@@ -2,3 +2,4 @@ PyJWT
 httpx
 uuid
 json
+aiofiles

@@ -3,7 +3,8 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import api
+import networking.api as api
+
 
 
 ASSET_PATH = "NoRiskClient/assets"

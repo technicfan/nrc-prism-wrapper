@@ -4,7 +4,7 @@ from pathlib import Path
 import time
 
 import jwt
-import api as api
+import networking.api as api
 import json
 
 path = "../../../"

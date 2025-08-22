@@ -19,7 +19,6 @@ async def download_single_asset(asset_id: str, path: str, asset_info: Dict,noris
             try:
                 path_obj = Path(path)
                 dir_path = path_obj.parent
-                #filename = path_obj.name
                 os.makedirs(f"{ASSET_PATH}/{dir_path}", exist_ok=True)
                 
                 # Download from CDN
