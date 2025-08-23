@@ -10,7 +10,7 @@
 4. Start your instance
 everything else should happen automaticaly
 
-_NOTE: Currently only the fabric versions are supported(1.21+) so no 1.8.9 _
+_NOTE: Currently only the fabric versions are supported(1.21+) so no 1.8.9_
 
 
 ### Todos
