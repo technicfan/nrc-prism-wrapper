@@ -17,6 +17,7 @@ MOJANG_SESSION_URL = "https://sessionserver.mojang.com"
 NORISK_API_URL = "https://api.norisk.gg/api/v1"
 
 async def download_jar(download_url,filename):
+    logger.info(f"Downloading {filename} from {download_url}")
     try:
         async with aiohttp.ClientSession() as client:
             async with client.get(download_url) as response:

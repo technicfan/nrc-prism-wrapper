@@ -6,8 +6,6 @@ import os
 from pathlib import Path
 from urllib.parse import urljoin
 import zipfile
-
-import aiofiles
 import networking.maven as maven
 import networking.api as api
 import networking.modrinth_api as modrinth
@@ -58,12 +56,17 @@ async def parse_version(version_string):
             # Handle other potential prefixes (like "forge.", "quilt.", etc.)
             first_dot = mc_part.find('.')
             if first_dot == -1:
-                raise ValueError(f"Invalid version format: {version_string}")
+                    logger.warning(f"Invalid version format: {version_string}")
+                    result['mod_version'] = version_string
+                    return result
             result['mod_version'] = mod_version
             result['mc_version'] = mc_part[first_dot + 1:]
             return result
     
-    raise ValueError(f"Invalid version format: {version_string}")
+    logger.warning(f"Invalid version format: {version_string}")
+    result['mod_version'] = version_string
+    return result
+    #raise ValueError(f"Invalid version format: {version_string}")
 
 
 
@@ -174,20 +177,6 @@ async def get_compatible_nrc_mods(mc_version):
     return maven, modrinth ,versions.get("repositories")
 
 
-async def is_version_compatible(target_version:str, constraint:str):
-    print(target_version)
-    current_version = version.parse(target_version)
-    min_version = version.parse(constraint.strip("=><"))
-    
-    if constraint.startswith('>='):
-        return current_version >= min_version
-    if constraint.startswith('<='):
-        return current_version <= min_version
-    if constraint.startswith('=='):
-        return current_version == min_version
-    
-    return False
-
 async def remove_installed_mods(mods:list,installed_mods:dict):
     result = []
     for mod in mods:
@@ -224,7 +213,6 @@ async def main():
         modrinth_api_calls.append(modrinth.get_versions(mod.get("source").get("projectId"),mod.get("source").get("projectSlug")))
     
     results = await asyncio.gather(*modrinth_api_calls)
-    mod_results = list(zip(modrinth_mods,results))
     download_tasks = []
     # modrinth mods
     for mod in modrinth_mods:
@@ -248,8 +236,14 @@ async def main():
     for artifact in maven_mods:
         url,filename = await build_maven_url(artifact,repos)
         download_tasks.append(download_jar(url,filename,artifact.get("old_file")))
-    logger.info("Downloading jars")
-    await asyncio.gather(*download_tasks)
+    
+
+    if download_tasks:
+        logger.info("Downloading jars")
+        
+        await asyncio.gather(*download_tasks)
+    else:
+        logger.info("No Jars need to be downloaded")
 
 
 
