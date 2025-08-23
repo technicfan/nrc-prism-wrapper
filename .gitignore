@@ -2,3 +2,4 @@ accounts.json
 *__pycache__*
 mods/*
 NoRiskClient/*
+.nrc-index.json

@@ -16,6 +16,18 @@ logging.basicConfig(level=logging.CRITICAL,format='%(asctime)s [%(levelname)s][%
 # Prism Launcher will call this script with the original Java command as arguments.
 # This script adds the -D property and then runs the command.
 
+async def download_data(token):
+
+    tasks =[
+        get_assets.main(token),
+        geather_jars.main()
+
+    ]
+    await asyncio.gather(*tasks)
+
+
+
+
 def main():
     # Check if the token is set. Exit with an error if it's not.
     token = asyncio.run(get_token.main())
@@ -23,8 +35,7 @@ def main():
         print("ERROR: Missing Norisk token", file=sys.stderr)
         sys.exit(1)
 
-    asyncio.run(get_assets.main(token))
-    asyncio.run(geather_jars.main())
+    asyncio.run(download_data(token))
 
     # Get the original command arguments
     original_args = sys.argv[1:]

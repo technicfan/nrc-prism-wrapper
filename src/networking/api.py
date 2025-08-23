@@ -15,27 +15,32 @@ import httpx
 ASSET_PATH = "NoRiskClient/assets"
 MOJANG_SESSION_URL = "https://sessionserver.mojang.com"
 NORISK_API_URL = "https://api.norisk.gg/api/v1"
+concurrent_downloads = 10
 
 async def download_jar(download_url,filename):
-    logger.info(f"Downloading {filename} from {download_url}")
-    try:
-        async with aiohttp.ClientSession() as client:
-            async with client.get(download_url) as response:
-                response.raise_for_status()
-                async with aiofiles.open(f"./mods/{filename}", 'wb') as f:
-                    async for chunk in response.content.iter_chunked(8192):
-                        await f.write(chunk)
-    except aiohttp.ClientResponseError as e:
-        if e.status == 404:
-            raise Exception(f"file not found: {download_url}")
-        else:
-            raise Exception(f"HTTP error: {e}")
-    except Exception as e:
-        raise Exception(f"Unexpected error: {e}")
+    logger = logging.getLogger("Mod Downloader")
+    logger.info(f"Downloading {filename} 🙏")
+    async with asyncio.Semaphore(concurrent_downloads):
+        try:
+            async with aiohttp.ClientSession() as client:
+                async with client.get(download_url) as response:
+                    response.raise_for_status()
+                    async with aiofiles.open(f"./mods/{filename}", 'wb') as f:
+                        async for chunk in response.content.iter_chunked(8192):
+                            await f.write(chunk)
+                        logger.info(f"Downloaded {filename} ✅")
+        except aiohttp.ClientResponseError as e:
+            if e.status == 404:
+                raise Exception(f"file not found: {download_url}")
+            else:
+                raise Exception(f"HTTP error: {e}")
+        except Exception as e:
+            raise Exception(f"Unexpected error: {e}")
 
 
 async def download_single_asset(asset_id: str, path: str, asset_info: Dict,norisk_token: str, semaphore: asyncio.Semaphore) -> None:
         """Download a single asset file"""
+        logger = logging.getLogger("Asset Downloader")
         async with semaphore:
             try:
                 path_obj = Path(path)
@@ -45,7 +50,7 @@ async def download_single_asset(asset_id: str, path: str, asset_info: Dict,noris
                 # Download from CDN
                 url = f"https://cdn.norisk.gg/assets/{asset_id}/assets/{path}"
                 headers = {"Authorization": f"Bearer {norisk_token}"}
-                
+                logger.info(f"Downloading: {path_obj.name}")
                 async with aiohttp.ClientSession() as session:
                     async with session.get(url, headers=headers) as response:
                         if response.status == 200:

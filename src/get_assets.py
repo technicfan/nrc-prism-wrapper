@@ -1,6 +1,7 @@
 import asyncio
 import hashlib
 import json
+import logging
 import os
 from pathlib import Path
 import networking.api as api
@@ -13,7 +14,7 @@ try:
 finally:
     pass
 
-concurrent_downloads = 10
+concurrent_downloads = 20
 async def verify_asset(path,data):
     file_path = Path(f"{ASSET_PATH}/{path}")
     if file_path.is_file():
@@ -29,7 +30,7 @@ async def calc_hash(file:Path):
         return hashlib.md5(f.read()).hexdigest()
 
 async def main(nrc_token):
-    print("Verifying Assets")
+    logger.info("Verifying Assets")
     metadata = await api.get_asset_metadata(nrc_token,"norisk-prod")
 
     verify_tasks = []
@@ -47,6 +48,8 @@ async def main(nrc_token):
     for path, asset_data in downloads:
         task = api.download_single_asset("norisk-prod",path,asset_data,nrc_token,semaphore)
         tasks.append(task)
-    print("Downloading missing")
+    logger.info("Downloading missing")
     results = await asyncio.gather(*tasks, return_exceptions=True)
-    print(results)
+
+
+logger = logging.getLogger("Assets")
