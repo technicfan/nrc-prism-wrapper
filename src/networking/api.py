@@ -1,10 +1,13 @@
 import asyncio
 import hashlib
+import logging
 import os
 from pathlib import Path
 from typing import Dict
 import uuid
-from venv import logger
+
+
+logger = logging.getLogger("Minecraft/Norisk API")
 
 import aiofiles
 import aiohttp
@@ -12,7 +15,24 @@ import httpx
 ASSET_PATH = "NoRiskClient/assets"
 MOJANG_SESSION_URL = "https://sessionserver.mojang.com"
 NORISK_API_URL = "https://api.norisk.gg/api/v1"
-        
+
+async def download_jar(download_url,filename):
+    try:
+        async with aiohttp.ClientSession() as client:
+            async with client.get(download_url) as response:
+                response.raise_for_status()
+                async with aiofiles.open(f"./mods/{filename}", 'wb') as f:
+                    async for chunk in response.content.iter_chunked(8192):
+                        await f.write(chunk)
+    except aiohttp.ClientResponseError as e:
+        if e.status == 404:
+            raise Exception(f"file not found: {download_url}")
+        else:
+            raise Exception(f"HTTP error: {e}")
+    except Exception as e:
+        raise Exception(f"Unexpected error: {e}")
+
+
 async def download_single_asset(asset_id: str, path: str, asset_info: Dict,norisk_token: str, semaphore: asyncio.Semaphore) -> None:
         """Download a single asset file"""
         async with semaphore:
@@ -240,3 +260,23 @@ async def join_server_session(
         except httpx.RequestError as e:
             logger.debug(f"API request failed: {e}")
             raise Exception(f"Minecraft API request failed: {e}")
+        
+
+async def get_norisk_versions():
+    url = f"{NORISK_API_URL}/launcher/modpacks"
+    async with httpx.AsyncClient() as client:
+        logger.info("Getting version profiles from norisk api")
+        try:
+            response = await client.get(
+                url
+            )
+            
+            if not response.is_success:
+                error_text = response.text
+                logger.debug(f"failed to get version profiles from norisk api: {error_text}")
+                raise Exception(f"failed to get version profiles from norisk api: {error_text}")
+            
+            return response.json()
+        except httpx.RequestError as e:
+            logger.debug(f"Norisk API request failed: {e}")
+            raise Exception(f"Norisk API request failed: {e}")

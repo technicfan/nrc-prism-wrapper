@@ -1,10 +1,14 @@
 import asyncio
+import logging
 import os
 import xml.etree.ElementTree as ET
 from urllib.parse import urljoin
 import aiofiles
 import requests
 import aiohttp
+
+logger = logging.getLogger("Maven Handler")
+
 
 repo_url="https://maven.norisk.gg/repository/norisk-production/"
 

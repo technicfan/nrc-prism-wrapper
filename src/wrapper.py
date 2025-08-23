@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 import asyncio
+import logging
 import os
 import sys
 from shutil import which
 import get_token
 import get_assets
 import geather_jars
+
+
+logging.basicConfig(level=logging.CRITICAL,format='%(asctime)s [%(levelname)s][%(name)s] %(message)s')
+
 
 # Wrapper script for the NoRisk instance.
 # Prism Launcher will call this script with the original Java command as arguments.
