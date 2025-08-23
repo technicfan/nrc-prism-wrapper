@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-import asyncio
+import get_dependencies
 import logging
+
+logging.basicConfig(level=logging.INFO,format='[%(asctime)s] [%(name)s/%(levelname)s] %(message)s',datefmt='%H:%M:%S')
+get_dependencies.check_dependencies()
+
+
+import asyncio
 import os
 import sys
 from shutil import which
 import get_token
 import get_assets
 import geather_jars
-
-
-logging.basicConfig(level=logging.CRITICAL,format='%(asctime)s [%(levelname)s][%(name)s] %(message)s')
-
 
 # Wrapper script for the NoRisk instance.
 # Prism Launcher will call this script with the original Java command as arguments.
@@ -29,6 +31,8 @@ async def download_data(token):
 
 
 def main():
+
+
     # Check if the token is set. Exit with an error if it's not.
     token = asyncio.run(get_token.main())
     if not token:

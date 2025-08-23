@@ -180,9 +180,4 @@ async def main():
     else:
         logger.info("No Jars need to be downloaded")
 
-
-
-logging.basicConfig(level=logging.INFO,format='%(asctime)s [%(levelname)s][%(name)s] %(message)s')
-
-
 logger = logging.getLogger("Jars Geatherer")
