@@ -14,9 +14,12 @@ _NOTE: Currently only the fabric versions are supported(1.21+) so no 1.8.9_
 
 
 ### Todos
+- set modloader version
+- handle other assets then prod
 - verfiy downloads by hash matching with maven repo(http://maven.norisk.gg/repository/norisk-production/gg/norisk/nrc-ui/1.0.78+fabric.1.21.7/nrc-ui-1.0.78+fabric.1.21.7.jar.md5/sha1/sha257/sha512) and modrinth
 - force newest setting(force install newest versions from maven repo or modrinth)
-- 1.8.9 support
+- 1.8.9 support/forge support
+
 
 
 #### Ideas

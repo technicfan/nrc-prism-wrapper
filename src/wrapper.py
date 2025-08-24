@@ -12,7 +12,7 @@ import sys
 from shutil import which
 import get_token
 import get_assets
-import geather_jars
+import install_norisk_version
 
 # Wrapper script for the NoRisk instance.
 # Prism Launcher will call this script with the original Java command as arguments.
@@ -22,7 +22,7 @@ async def download_data(token):
 
     tasks =[
         get_assets.main(token),
-        geather_jars.main()
+        install_norisk_version.main()
 
     ]
     await asyncio.gather(*tasks)
