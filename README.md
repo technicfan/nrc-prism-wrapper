@@ -10,8 +10,9 @@
 4. Start your instance
 everything else should happen automaticaly
 
-_NOTE: Currently only the fabric versions are supported(1.21+) so no 1.8.9_
+On some systems you may need to install the dependencies manually, just look at the req.txt or the get_dependencies.py
 
+_NOTE: Currently only the fabric versions are supported(1.21+) so no 1.8.9_
 
 ### Todos
 - set modloader version
