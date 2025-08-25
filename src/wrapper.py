@@ -17,6 +17,8 @@ import tasks.install_norisk_version as install_norisk_version
 # Prism Launcher will call this script with the original Java command as arguments.
 # This script adds the -D property, downloads assets, mods and then runs the command.
 
+os.makedirs("./mods",exist_ok=True)
+
 async def download_data(token):
 
     tasks =[
@@ -28,7 +30,6 @@ async def download_data(token):
 
 def main():
     asyncio.run(install_norisk_version.main())
-    return
 
     # Check if the token is set. Exit with an error if it's not.
     token = asyncio.run(get_token.main())

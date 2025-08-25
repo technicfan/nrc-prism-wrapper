@@ -13,15 +13,14 @@ IGNORE_LIST = []
 
 ASSET_PATH = "NoRiskClient/assets"
 
-if config.REMOVE_WATERMARK:
-    IGNORE_LIST.append("nrc-cosmetics/assets/noriskclient/textures/noriskclient-logo-text.png")
-    shutil.copy(f"{config.WRAPPER_ROOT}/assets/no_watermark.png", f"{ASSET_PATH}/nrc-cosmetics/assets/noriskclient/textures/noriskclient-logo-text.png")
-
 
 try:
     os.makedirs(ASSET_PATH,exist_ok=True)
 finally:
     pass
+
+if config.REMOVE_WATERMARK:
+    IGNORE_LIST.append("nrc-cosmetics/assets/noriskclient/textures/noriskclient-logo-text.png")
 
 concurrent_downloads = 20
 async def verify_asset(path,data):
@@ -60,6 +59,9 @@ async def main(nrc_token):
         tasks.append(task)
     logger.info("Downloading missing")
     results = await asyncio.gather(*tasks, return_exceptions=True)
+    if config.REMOVE_WATERMARK:
+        shutil.copy(f"{config.WRAPPER_ROOT}/assets/no_watermark.png", f"{ASSET_PATH}/nrc-cosmetics/assets/noriskclient/textures/noriskclient-logo-text.png")
+
 
 
 logger = logging.getLogger("Assets")
