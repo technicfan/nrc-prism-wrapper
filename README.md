@@ -3,6 +3,11 @@
 > [!WARNING]
 > **Attention:** There may be security issues since i dont know anything about security, so i cant guarantee any.
 
+# Features
+- Run Norisk Client trough prism launcher
+- remove norisk client watermark
+
+
 # Usage
 1. You need to have logged into the default NRC(Norisk Client) Launcher at least once.
 2. Go into Prism(multimc may also work) edit an instance, go to **Settings>Custom Commands**
@@ -19,6 +24,7 @@ _NOTE: Currently only the fabric versions are supported(1.21+)_
 - handle assets other then prod
 - verfiy downloads by hash matching with maven repo(http://maven.norisk.gg/repository/norisk-production/gg/norisk/nrc-ui/1.0.78+fabric.1.21.7/nrc-ui-1.0.78+fabric.1.21.7.jar.md5/sha1/sha257/sha512) and modrinth
 - force newest setting(force install newest versions from maven repo or modrinth)
+- full resourcepack override support
 
 
 
