@@ -29,6 +29,7 @@ async def download_jar(download_url,filename):
                         async for chunk in response.content.iter_chunked(8192):
                             await f.write(chunk)
                         logger.info(f"Downloaded {filename} ✅")
+                        return True
         except aiohttp.ClientResponseError as e:
             if e.status == 404:
                 logger.exception(f"file not found: {download_url}")

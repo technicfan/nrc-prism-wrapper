@@ -27,7 +27,8 @@ async def download_data(token):
     await asyncio.gather(*tasks)
 
 def main():
-
+    asyncio.run(install_norisk_version.main())
+    return
 
     # Check if the token is set. Exit with an error if it's not.
     token = asyncio.run(get_token.main())
