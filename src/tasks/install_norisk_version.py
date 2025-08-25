@@ -6,11 +6,9 @@ import logging
 import os
 from pathlib import Path
 from urllib.parse import urljoin
-import zipfile
 import networking.maven as maven
 import networking.api as api
 import networking.modrinth_api as modrinth
-from packaging import version
 
 
 script_dir = Path(__file__).resolve().parent

@@ -1,5 +1,3 @@
-import asyncio
-from asyncio.log import logger
 from pathlib import Path
 import time
 

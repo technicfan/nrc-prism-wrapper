@@ -26,9 +26,6 @@ async def download_data(token):
     ]
     await asyncio.gather(*tasks)
 
-
-
-
 def main():
 
 

@@ -4,7 +4,7 @@
 > **Attention:** There may be security issues since i dont know anything about security, so i cant guarantee any.
 
 # Features
-- Run Norisk Client trough prism launcher
+- Run [Norisk Client](https://norisk.gg/) trough prism launcher
 - remove norisk client watermark
 
 
