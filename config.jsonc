@@ -1,0 +1,7 @@
+{
+    // remove the "Norisk Client" text/watermark from uis
+    "remove_watermark" : true,
+    //TODO DOES NOT WORK CURRENTLY(force install newest mod versions) 
+    "force_newest_mods": false
+}
+    

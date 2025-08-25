@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-import get_dependencies
+import tasks.get_dependencies as get_dependencies
 import logging
-
 logging.basicConfig(level=logging.INFO,format='[%(asctime)s] [%(name)s/%(levelname)s] %(message)s',datefmt='%H:%M:%S')
 get_dependencies.check_dependencies()
 
@@ -10,13 +9,13 @@ import asyncio
 import os
 import sys
 from shutil import which
-import get_token
-import get_assets
-import install_norisk_version
+import tasks.get_token as get_token
+import tasks.get_assets as get_assets
+import tasks.install_norisk_version as install_norisk_version
 
 # Wrapper script for the NoRisk instance.
 # Prism Launcher will call this script with the original Java command as arguments.
-# This script adds the -D property and then runs the command.
+# This script adds the -D property, downloads assets, mods and then runs the command.
 
 async def download_data(token):
 

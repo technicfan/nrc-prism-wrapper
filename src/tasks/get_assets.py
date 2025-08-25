@@ -5,10 +5,20 @@ import logging
 import os
 from pathlib import Path
 import networking.api as api
+import config
+import shutil
 
 
+
+IGNORE_LIST = []
 
 ASSET_PATH = "NoRiskClient/assets"
+
+if config.REMOVE_WATERMARK:
+    IGNORE_LIST.append("nrc-cosmetics/assets/noriskclient/textures/noriskclient-logo-text.png")
+    shutil.copy(f"{config.WRAPPER_ROOT}/assets/no_watermark.png", f"{ASSET_PATH}/nrc-cosmetics/assets/noriskclient/textures/noriskclient-logo-text.png")
+
+
 try:
     os.makedirs(ASSET_PATH,exist_ok=True)
 finally:
@@ -35,11 +45,12 @@ async def main(nrc_token):
 
     verify_tasks = []
     for name, asset_info in metadata.get("objects", {}).items():
-        task = verify_asset(
-            name,
-            asset_info
-        )
-        verify_tasks.append(task)
+        if not name in IGNORE_LIST:
+            task = verify_asset(
+                name,
+                asset_info
+            )
+            verify_tasks.append(task)
     results = await asyncio.gather(*verify_tasks)
     downloads = [result for result in results if result is not None]
 

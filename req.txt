@@ -4,3 +4,5 @@ uuid
 json
 aiofiles
 packaging
+
+json5

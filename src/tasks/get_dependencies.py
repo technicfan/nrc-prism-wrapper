@@ -10,7 +10,8 @@ REQUIRED_PACKAGES = [
     'httpx',
     'uuid',
     'aiofiles',
-    'packaging'
+    'packaging',
+    'json5'
 ]
 
 

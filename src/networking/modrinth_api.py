@@ -2,20 +2,23 @@
 from asyncio import Semaphore
 import logging
 import httpx
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 logger = logging.getLogger("Modrinth API")
 
 
-semaphore = Semaphore(10)
+semaphore = Semaphore(8)
 BASE_URL = "https://api.modrinth.com/v2"
 
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
 async def get_versions(project,project_slug=None):
     url = f"{BASE_URL}/project/{project}/version"
     async with semaphore:
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.get(
-                    url
+                    url,
+                    timeout=30.0
                 )
                 
                 if not response.is_success:
@@ -31,7 +34,10 @@ async def get_versions(project,project_slug=None):
                     project: response.json()
                 }
             except httpx.RequestError as e:
-                logger.debug(f"modrinth api request failed: {e}")
-                raise Exception(f"modrinth api request failed: {e}")
+                logger.debug(f"modrinth api request failed: {url} errot")
+                raise Exception(f"modrinth api request failed: {url}")
+            except httpx.TimeoutException as e:
+                logger.debug(f"modrinth api request Timeout: {url}")
+                raise Exception(f"modrinth api request Timeout: {url}")
             
 
