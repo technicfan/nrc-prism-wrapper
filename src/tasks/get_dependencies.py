@@ -13,7 +13,8 @@ REQUIRED_PACKAGES = [
     'packaging',
     'json5',
     'aiohttp',
-    'requests'
+    'requests',
+    'tenacity'
     ]
 
 

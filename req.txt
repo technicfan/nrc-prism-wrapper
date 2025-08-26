@@ -7,3 +7,4 @@ packaging
 aiohttp
 json5
 requests
+tenacity
