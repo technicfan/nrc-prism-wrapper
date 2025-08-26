@@ -26,7 +26,7 @@ def check_dependencies():
     missing_packages = []
     for package in REQUIRED_PACKAGES:
         try:
-            importlib.import_module(package.split('>')[0].split('<')[0].split('=')[0])
+            importlib.import_module(package.split('>')[0].split('<')[0].split('=')[0].replace("PyJWT", "jwt"))
         except ImportError:
             missing_packages.append(package)
     
