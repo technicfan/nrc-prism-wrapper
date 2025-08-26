@@ -5,7 +5,9 @@ import jwt
 import networking.api as api
 import json
 
-path = "../../../"
+import config
+
+path = config.PRISM_DATA_DIR
 
 async def is_token_expired(token):
     token_byte = token.encode('utf-8')
