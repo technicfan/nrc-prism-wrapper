@@ -1,5 +1,6 @@
 accounts.json
 *__pycache__*
-mods/*
+mods
 NoRiskClient/*
 .nrc-index.json
+config.jsonc
