@@ -11,8 +11,10 @@ REQUIRED_PACKAGES = [
     'uuid',
     'aiofiles',
     'packaging',
-    'json5'
-]
+    'json5',
+    'aiohttp',
+    'requests'
+    ]
 
 
 def install_package(package):

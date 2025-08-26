@@ -44,7 +44,6 @@ async def update_maven_jar(new_version,artifact,old_file):
     
 
 async def download_jar(url,filename,version:str,ID:str, old_file=None):
-    print(old_file)
     a = await api.download_jar(url,filename)
     if a != old_file and a != None and old_file != None:
         os.remove(f"./mods/{old_file}")
