@@ -54,7 +54,8 @@ def main():
         if (arg.endswith('java') or 
             arg == 'net.minecraft.client.main.Main' or 
             arg.endswith('/java') or 
-            arg.endswith('\\java.exe')):
+            arg.endswith('\\java.exe') or
+            arg.endswith('javaw.exe')) and not token_added:
             new_cmd.append(f"-Dnorisk.token={token}")
             token_added = True
     
