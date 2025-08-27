@@ -28,7 +28,7 @@ async def read_token_from_file(path,uuid):
         with open(f"{path}norisk_data.json", "r") as f:
             data = json.load(f)
             for entry in data:
-                if entry[uuid]:
+                if entry.get(uuid):
                     return entry[uuid]
 async def get_prsim_data(path):
     with open(f"{path}/accounts.json","r") as f:

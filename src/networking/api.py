@@ -3,6 +3,7 @@ import hashlib
 import logging
 import os
 from pathlib import Path
+import platform
 from typing import Dict
 import uuid
 
@@ -185,7 +186,7 @@ async def validate_with_norisk_api(username,server_id):
                 url,
                 params={
                     "force": False,
-                    "hwid": uuid.uuid4(),
+                    "hwid": hashlib.md5(f"{platform.node()}{uuid.getnode()}{platform.machine()}".encode()).hexdigest(),
                     "username": username,
                     "server_id": server_id
                 }
