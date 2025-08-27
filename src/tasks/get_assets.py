@@ -74,7 +74,7 @@ async def main(nrc_token:str):
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
     if config.REMOVE_WATERMARK:
-        shutil.copy(f"{config.WRAPPER_ROOT}/assets/no_watermark.png", f"{ASSET_PATH}/nrc-cosmetics/assets/noriskclient/textures/noriskclient-logo-text.png")
+        shutil.copy(f"{config.WRAPPER_ROOT}/src/assets/no_watermark.png", f"{ASSET_PATH}/nrc-cosmetics/assets/noriskclient/textures/noriskclient-logo-text.png")
 
 
 
