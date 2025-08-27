@@ -19,10 +19,10 @@ async def is_token_expired(token):
     exp_time = decoded.get('exp')
     current_time = time.time()
     if current_time > exp_time:
-        print("Token is expired")
+        logger.warning("Stored Token is expired")
         return True
     else:
-        print("Token is valid")
+        logger.info("Stored Token is valid")
         return False
 
 async def read_token_from_file(path,uuid):
@@ -43,7 +43,6 @@ async def write_token(token,player_uuid,path):
             data = json.load(f)
     else:
         data = {}
-    logger.info(data)
     data[str(player_uuid)] = token
     with open(f"{path}/norisk_data.json", "w") as f:
         f.write(json.dumps(data,indent=2))
