@@ -19,6 +19,7 @@ NORISK_API_URL = "https://api.norisk.gg/api/v1"
 concurrent_downloads = 10
 
 async def download_jar(download_url,filename):
+    """Downloads jar file from given url"""
     logger = logging.getLogger("Mod Downloader")
     logger.info(f"Downloading {filename} 🙏")
     async with asyncio.Semaphore(concurrent_downloads):
