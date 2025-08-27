@@ -24,6 +24,7 @@ if config.REMOVE_WATERMARK:
 
 concurrent_downloads = 20
 async def verify_asset(path,data):
+
     file_path = Path(f"{ASSET_PATH}/{path}")
     if file_path.is_file():
         local_hash = await calc_hash(file_path)
@@ -34,10 +35,22 @@ async def verify_asset(path,data):
 
 
 async def calc_hash(file:Path):
+    '''
+    Calculates the md5 hash for given path
+    
+    Args:
+        file: path to a file
+    '''
     with open(file,'rb') as f:
         return hashlib.md5(f.read()).hexdigest()
 
-async def main(nrc_token):
+async def main(nrc_token:str):
+    '''
+    Verifys and Downloads Assets
+
+    Args:
+        nrc_token: a valid noriskclient token
+    '''
     logger.info("Verifying Assets")
     metadata = await api.get_asset_metadata(nrc_token,"norisk-prod")
 
@@ -59,6 +72,7 @@ async def main(nrc_token):
         tasks.append(task)
     logger.info("Downloading missing")
     results = await asyncio.gather(*tasks, return_exceptions=True)
+
     if config.REMOVE_WATERMARK:
         shutil.copy(f"{config.WRAPPER_ROOT}/assets/no_watermark.png", f"{ASSET_PATH}/nrc-cosmetics/assets/noriskclient/textures/noriskclient-logo-text.png")
 

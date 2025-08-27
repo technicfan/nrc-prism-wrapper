@@ -25,25 +25,46 @@ class ModEntry():
     maven_id :str
 
 async def calc_hash(file:Path):
+    '''
+    Calculates the md5 hash for given path
+    
+    Args:
+        file: path to a file
+    '''
     with open(file,'rb') as f:
         return hashlib.md5(f.read()).hexdigest()
 
 async def get_mc_version():
+    '''
+    Reads the installed Minecraft Version for the current instance
+
+    Returns:
+        minecraft_version:str
+    '''
     with open("../mmc-pack.json") as f:
         mmc_pack = json.load(f)
         for component in mmc_pack.get("components"):
             if component.get("uid") == "net.minecraft":
                 return component.get("version")
-
-
-async def update_maven_jar(new_version,artifact,old_file):
-    a = await maven.download_maven_artifact(artifact.get("group"),artifact.get("artifact"),new_version)
-
-    if a != old_file and a != None and old_file != None:
-        os.remove(f"./mods/{old_file}")
     
 
 async def download_jar(url,filename,version:str,ID:str, old_file=None):
+    '''
+    Downloads a jar file from given url
+
+    Args:
+        url:str | download url
+        filename:str | name of the downloaded file
+        version:str | version that will be installed
+        ID:str | mod ID
+
+    Optional:
+        old_file=None| old file to delete
+    
+    Returns:
+        index_entry:dict | a dict in the format of the index
+    '''
+
     a = await api.download_jar(url,filename)
     if a != old_file and a != None and old_file != None:
         os.remove(f"./mods/{old_file}")
@@ -56,6 +77,12 @@ async def download_jar(url,filename,version:str,ID:str, old_file=None):
 
 
 async def read_index():
+    '''
+    Reads installed versions index
+
+    Returns:
+        index_data:list
+    '''
     try:
         with open(".nrc-index.json") as f:
             return json.load(f)
@@ -63,6 +90,13 @@ async def read_index():
         return []
 
 async def get_installed_versions():
+    '''
+    Scans the mod dir for installed mods and links them to thier index entry
+
+    Returns
+        result:dict
+    '''
+
     index = await read_index()
     hashes = {}
     files = os.scandir("./mods")
@@ -84,6 +118,18 @@ async def get_installed_versions():
 
 
 async def get_compatible_nrc_mods(mc_version):
+    '''
+    Gets mods from norisk api and Filters them for  compatibility with given mc_version
+
+    Args:
+        mc_version:str
+
+    Returns:
+        mods:list| compatible mods
+        repos:dict| repository refrences
+
+    '''
+
     versions = await api.get_norisk_versions()
     prod =versions.get("packs").get("norisk-prod")
     
@@ -108,6 +154,13 @@ async def get_compatible_nrc_mods(mc_version):
 
 
 async def remove_installed_mods(mods:list[ModEntry],installed_mods:dict) -> tuple[list[ModEntry],list[ModEntry]]:
+    '''
+    Removes already installed mods form modlist
+
+    Args:
+        mods: Remote mods
+        installed_mods
+    '''
     result = []
     removed = []
     for mod in mods:
@@ -124,11 +177,25 @@ async def remove_installed_mods(mods:list[ModEntry],installed_mods:dict) -> tupl
     return result , removed
 
 async def write_to_index_file(data:list):
+    '''
+    Writes data to  ".nrc-index.json" index file
+    '''
     with open(".nrc-index.json","w") as f:
         json.dump(data,f,indent=2)
 
 
 async def build_maven_url(artifact:ModEntry,repos):
+    '''
+    builds maven url from ModEntry
+
+    Args:
+        artifact:ModEntry
+        repos: repository refrences
+    Returns:
+        url:download uil
+        filename: name of the file
+    '''
+
     group_path = artifact.groupId.replace('.', '/')
     
     filename = f"{artifact.maven_id}-{artifact.version}.jar"
@@ -136,6 +203,9 @@ async def build_maven_url(artifact:ModEntry,repos):
     return urljoin(repos.get(artifact.repositoryRef), artifact_path),filename
 
 async def convert_to_index(mods:list[ModEntry]):
+        '''
+        Converts ModEntrys to index format
+        '''
         result = []
         for mod in mods:
             result.append({
@@ -149,6 +219,9 @@ async def convert_to_index(mods:list[ModEntry]):
 
 
 async def main():
+    '''
+    Verifys and installs mod jars
+    '''
     mc_version = await get_mc_version()
     mods,repos = await get_compatible_nrc_mods(mc_version)
     installed_mods = await get_installed_versions()
