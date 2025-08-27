@@ -78,7 +78,7 @@ async def main(nrc_token:str):
         try:
             #dev env
             shutil.copy(f"{config.WRAPPER_ROOT}/assets/no_watermark.png", f"{ASSET_PATH}/nrc-cosmetics/assets/noriskclient/textures/noriskclient-logo-text.png")
-        except NotADirectoryError or FileNotFoundError:
+        except (NotADirectoryError,FileNotFoundError):
             # in pyz package
             with zipfile.ZipFile(config.WRAPPER_ROOT, 'r') as z:
                 with z.open("assets/no_watermark.png") as src_file:
