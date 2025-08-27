@@ -9,7 +9,7 @@ root_copy =[
     "req.txt"
 ]
 
-shutil.rmtree("build")
+shutil.rmtree("build",ignore_errors=True)
 
 shutil.copytree('src',"build/temp")
 
