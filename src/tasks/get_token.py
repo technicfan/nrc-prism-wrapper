@@ -1,9 +1,11 @@
 from pathlib import Path
 import time
-
+import logging
 import jwt
 import networking.api as api
 import json
+
+logger = logging.getLogger("Norisk Token")
 
 path = "../../../"
 
@@ -27,9 +29,8 @@ async def read_token_from_file(path,uuid):
     if Path(f"{path}norisk_data.json").is_file():
         with open(f"{path}norisk_data.json", "r") as f:
             data = json.load(f)
-            for entry in data:
-                if entry.get(uuid):
-                    return entry[uuid]
+            if uuid in data:
+                return data[uuid]
 async def get_prsim_data(path):
     with open(f"{path}/accounts.json","r") as f:
         accounts = json.load(f)
@@ -37,17 +38,13 @@ async def get_prsim_data(path):
     return active.get("msa").get("token") , active.get("profile").get("name") , active.get("profile").get("id")
     
 async def write_token(token,player_uuid,path):
-    if Path(f"{path} / norisk_data.json").is_file():
+    if Path(f"{path}/norisk_data.json").is_file():
         with open(f"{path}/norisk_data.json", "r") as f:
             data = json.load(f)
     else:
-        data = []
-
-    entry = {
-        str(player_uuid) : token
-    }
-    data[:] = [entry for entry in data if entry["uuid"] != player_uuid]
-    data.append(entry)
+        data = {}
+    logger.info(data)
+    data[str(player_uuid)] = token
     with open(f"{path}/norisk_data.json", "w") as f:
         f.write(json.dumps(data,indent=2))
 
