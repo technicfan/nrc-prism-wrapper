@@ -5,3 +5,4 @@ NoRiskClient/*
 .nrc-index.json
 config.jsonc
 nrc-wrapper.pyz
+build

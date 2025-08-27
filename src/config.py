@@ -3,7 +3,7 @@ import json5
 from pathlib import Path
 
 
-WRAPPER_ROOT = (Path(__file__).resolve()).parent.parent
+WRAPPER_ROOT = (Path(__file__).resolve()).parent
 
 
 def get_config():
@@ -21,11 +21,11 @@ def get_config():
     '''
 
     try:
-        with open(f"{WRAPPER_ROOT}/config.jsonc","r") as f:
+        with open(f"{WRAPPER_ROOT.parent}/config.jsonc","r") as f:
             config = json5.load(f)
     except FileNotFoundError:
         config = json5.loads(default_config)
-        with open(f"{WRAPPER_ROOT}/config.jsonc","w") as f:
+        with open(f"{WRAPPER_ROOT.parent}/config.jsonc","w") as f:
             f.write(default_config)
 
 

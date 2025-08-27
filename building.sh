@@ -1,1 +1,0 @@
-python -m zipapp src -p "/usr/bin/env python3" -o nrc-wrapper.pyz

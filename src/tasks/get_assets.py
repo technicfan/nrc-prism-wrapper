@@ -3,6 +3,7 @@ import hashlib
 import logging
 import os
 from pathlib import Path
+import zipfile
 import networking.api as api
 import config
 import shutil
@@ -74,7 +75,15 @@ async def main(nrc_token:str):
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
     if config.REMOVE_WATERMARK:
-        shutil.copy(f"{config.WRAPPER_ROOT}/src/assets/no_watermark.png", f"{ASSET_PATH}/nrc-cosmetics/assets/noriskclient/textures/noriskclient-logo-text.png")
+        try:
+            #dev env
+            shutil.copy(f"{config.WRAPPER_ROOT}/assets/no_watermark.png", f"{ASSET_PATH}/nrc-cosmetics/assets/noriskclient/textures/noriskclient-logo-text.png")
+        except NotADirectoryError:
+            # in pyz package
+            with zipfile.ZipFile(config.WRAPPER_ROOT, 'r') as z:
+                with z.open("assets/no_watermark.png") as src_file:
+                    with open(f"{ASSET_PATH}/nrc-cosmetics/assets/noriskclient/textures/noriskclient-logo-text.png", 'wb') as dst_file:
+                        shutil.copyfileobj(src_file, dst_file)
 
 
 
