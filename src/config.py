@@ -13,6 +13,8 @@ def get_config():
 {
     // remove the "Norisk Client" text/watermark from uis
     "remove_watermark" : true,
+    // the directory this script looks for the minecraft auth token
+    "prism_data_dir": "../../..",
     //TODO DOES NOT WORK CURRENTLY(force install newest mod versions) 
     "force_newest_mods": false
 }
@@ -33,7 +35,8 @@ def get_config():
 c = get_config()
 
 REMOVE_WATERMARK = c.get("remove_watermark")
+PRISM_DATA_DIR = c.get("prism_data_dir")
 FORCE_NEWEST_MODS = c.get("force_newest_mods")
 
 
-__all__ = ["REMOVE_WATERMARK","FORCE_NEWEST_MODS","WRAPPER_ROOT"]
+__all__ = ["REMOVE_WATERMARK","PRISM_DATA_DIR","FORCE_NEWEST_MODS","WRAPPER_ROOT"]

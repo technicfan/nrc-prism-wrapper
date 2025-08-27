@@ -67,7 +67,7 @@ async def get_installed_versions():
     hashes = {}
     files = os.scandir("./mods")
     for f in files:
-        if f.name.endswith(".jar"):
+        if f.name.endswith(".jar") or f.name.endswith(".jar.disabled"):
             hashes[await calc_hash(f)] = {
                 "filename" : f.name
             }

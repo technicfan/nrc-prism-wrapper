@@ -4,10 +4,11 @@ import logging
 import jwt
 import networking.api as api
 import json
-
+import config
+path = config.PRISM_DATA_DIR
 logger = logging.getLogger("Norisk Token")
 
-path = "../../../"
+
 
 async def is_token_expired(token):
     token_byte = token.encode('utf-8')
