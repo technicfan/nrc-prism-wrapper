@@ -7,7 +7,6 @@ import logging
 import os
 from pathlib import Path
 from urllib.parse import urljoin
-import networking.maven as maven
 import networking.api as api
 import networking.modrinth_api as modrinth
 
