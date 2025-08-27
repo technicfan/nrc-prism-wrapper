@@ -62,7 +62,6 @@ def main():
         new_cmd.append(f"-Dnorisk.token={token}")
     # Execute
     try:
-        logger.info(new_cmd[1])
         os.execvp(new_cmd[0], new_cmd)
     except FileNotFoundError:
         print(f"ERROR: Command not found: {new_cmd[0]}", file=sys.stderr)
