@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import subprocess
 import tasks.get_dependencies as get_dependencies
 import logging
 logging.basicConfig(level=logging.INFO,format='[%(asctime)s] [%(name)s/%(levelname)s] %(message)s',datefmt='%H:%M:%S')
@@ -63,7 +64,27 @@ def main():
         new_cmd.append(f"-Dnorisk.token={token}")
     # Execute
     try:
-        os.execvp(new_cmd[0], new_cmd)
+        # windows log output workaround(i hate you billie)
+        # TODO for some reason the log reading is very slow and wierd but at least it works
+        if sys.platform == "win32":
+            logger.warning("Using Windows log stream workaround... the log may be slow")
+            process = subprocess.Popen(
+                new_cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                bufsize=1,
+                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
+            )
+            while True:
+                output = process.stdout.readline()
+                if output == '' and process.poll() is not None:
+                    break
+                if output:
+                    print(output.strip())
+            sys.exit(process.returncode)
+        else:
+            os.execvp(new_cmd[0], new_cmd)
     except FileNotFoundError:
         print(f"ERROR: Command not found: {new_cmd[0]}", file=sys.stderr)
         sys.exit(1)
