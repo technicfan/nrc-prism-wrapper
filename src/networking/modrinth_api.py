@@ -17,8 +17,7 @@ async def get_versions(project,project_slug=None):
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.get(
-                    url,
-                    timeout=30.0
+                    url
                 )
                 
                 if not response.is_success:

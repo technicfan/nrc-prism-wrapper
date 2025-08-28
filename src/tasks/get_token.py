@@ -72,7 +72,7 @@ async def get_prsim_data(path):
     '''
     with open(f"{path}/accounts.json","r") as f:
         accounts = json.load(f)
-    active = next((item for item in accounts.get("accounts") if item.get('active') == True), None)
+    active = next((item for item in accounts.get("accounts") if item.get('active')), None)
     return active.get("ygg").get("token") , active.get("profile").get("name") , active.get("profile").get("id")
     
 async def write_token(token:str,player_uuid,path):

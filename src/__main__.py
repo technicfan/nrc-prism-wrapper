@@ -2,7 +2,7 @@
 import subprocess
 import tasks.get_dependencies as get_dependencies
 import logging
-logging.basicConfig(level=logging.DEBUG,format='[%(asctime)s] [%(name)s/%(levelname)s] %(message)s',datefmt='%H:%M:%S',filename="nrc-wrapper.log",filemode="a")
+logging.basicConfig(level=logging.DEBUG,format='[%(asctime)s] [%(name)s/%(levelname)s] %(message)s',datefmt='%H:%M:%S')
 get_dependencies.check_dependencies()
 
 logger = logging.getLogger("NRC Wrapper")

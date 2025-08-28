@@ -57,7 +57,7 @@ async def main(nrc_token:str):
     logger.info("Verifying Assets")
     verify_tasks = []
     for name, asset_info in metadata.get("objects", {}).items():
-        if not name in IGNORE_LIST:
+        if name not in IGNORE_LIST:
             task = verify_asset(
                 name,
                 asset_info

@@ -52,7 +52,6 @@ async def get_mc_version():
     else:
         try:
             data = duckdb.connect("../../app.db",read_only=True)
-            logger.info("after this line it gets stuck yay")
             current_dir_name = Path(os.getcwd()).name
             data = data.sql(f"SELECT game_version FROM profiles WHERE path = '{current_dir_name}'").fetchall()
             return data[0][0]
@@ -78,7 +77,7 @@ async def download_jar(url,filename,version:str,ID:str, old_file=None):
     '''
 
     a = await api.download_jar(url,filename)
-    if a != old_file and a != None and old_file != None:
+    if a != old_file and a is not None and old_file is not None:
         os.remove(f"./mods/{old_file}")
     # stuffs thats written to index
     return {

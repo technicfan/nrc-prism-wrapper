@@ -6,13 +6,13 @@ from pathlib import Path
 import platform
 from typing import Dict
 import uuid
+import aiofiles
+import aiohttp
+import httpx
 
 
 logger = logging.getLogger("Minecraft/Norisk API")
 
-import aiofiles
-import aiohttp
-import httpx
 ASSET_PATH = "NoRiskClient/assets"
 MOJANG_SESSION_URL = "https://sessionserver.mojang.com"
 NORISK_API_URL = "https://api.norisk.gg/api/v1"
@@ -84,7 +84,6 @@ async def get_asset_metadata(asset_id):
     url = f"https://api.norisk.gg/api/v1/launcher/pack/{asset_id}"
     async with aiohttp.ClientSession() as session:
         try:
-            logger.info("after this line it gets stuck yay")
             async with session.get(url) as response:
                 logger.info(response.status)
                 if response.status == 200:
