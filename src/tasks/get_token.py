@@ -73,7 +73,7 @@ async def get_prsim_data(path):
     with open(f"{path}/accounts.json","r") as f:
         accounts = json.load(f)
     active = next((item for item in accounts.get("accounts") if item.get('active') == True), None)
-    return active.get("msa").get("token") , active.get("profile").get("name") , active.get("profile").get("id")
+    return active.get("ygg").get("token") , active.get("profile").get("name") , active.get("profile").get("id")
     
 async def write_token(token:str,player_uuid,path):
     '''
@@ -103,19 +103,16 @@ async def main():
         norisk_token:str
     '''
     if config.LAUNCHER == "modrinth":
-        msa_token, mc_name, uuid = await get_modrinth_data("../../")
+        mc_token, mc_name, uuid = await get_modrinth_data("../../")
     else:
-        msa_token, mc_name, uuid = await get_prsim_data(path)
-    
-    logger.info(msa_token)
+        mc_token, mc_name, uuid = await get_prsim_data(path)
 
     stored_token = await read_token_from_file(path,uuid)
     if stored_token:
         if not await is_token_expired(stored_token):
             return stored_token
-    minecraft_access_token, player_uuid = await api.exchange_microsoft_for_minecraft_token(msa_token)
     norisk_server_id = await api.request_server_id()
-    await api.join_server_session(minecraft_access_token,player_uuid,norisk_server_id)
+    await api.join_server_session(mc_token,uuid,norisk_server_id)
     norisk_token = await api.validate_with_norisk_api(mc_name,norisk_server_id)
-    await write_token(norisk_token,player_uuid,path)
+    await write_token(norisk_token,uuid,path)
     return norisk_token

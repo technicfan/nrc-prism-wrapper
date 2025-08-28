@@ -8,7 +8,7 @@ import networking.api as api
 import config
 import shutil
 
-
+logger = logging.getLogger("Assets")
 
 IGNORE_LIST = []
 
@@ -53,8 +53,8 @@ async def main(nrc_token:str):
         nrc_token: a valid noriskclient token
     '''
     logger.info("Verifying Assets")
-    metadata = await api.get_asset_metadata(nrc_token,"norisk-prod")
-
+    metadata = await api.get_asset_metadata("norisk-prod")
+    logger.info("Verifying Assets")
     verify_tasks = []
     for name, asset_info in metadata.get("objects", {}).items():
         if not name in IGNORE_LIST:
@@ -87,4 +87,4 @@ async def main(nrc_token:str):
 
 
 
-logger = logging.getLogger("Assets")
+
