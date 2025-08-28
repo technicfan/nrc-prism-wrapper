@@ -50,9 +50,9 @@ async def get_mc_version():
                 if component.get("uid") == "net.minecraft":
                     return component.get("version")
     else:
-        data = duckdb.connect("../../app.db",read_only=True)
-        # fuck you
-        data = data.sql(f"SELECT game_version FROM profiles where path = \"{Path(os.getcwd()).name}\"").fetchall()
+        data = await duckdb.connect("../../app.db",read_only=True)
+        logger.info("after this line it gets stuck yay")
+        data = await data.sql(f"SELECT game_version FROM profiles where path = \"{Path(os.getcwd()).name}\"").fetchall()
         return data[0][0]
     
 
@@ -231,6 +231,7 @@ async def main():
     Verifys and installs mod jars
     '''
     mc_version = await get_mc_version()
+    logger.info("getting jars")
     mods,repos = await get_compatible_nrc_mods(mc_version)
     installed_mods = await get_installed_versions()
 

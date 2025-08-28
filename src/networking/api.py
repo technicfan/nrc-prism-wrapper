@@ -84,7 +84,7 @@ async def get_asset_metadata(asset_id):
     url = f"https://api.norisk.gg/api/v1/launcher/pack/{asset_id}"
     async with aiohttp.ClientSession() as session:
         try:
-            logger.info("Getting asset metadata")
+            logger.info("after this line it gets stuck yay")
             async with session.get(url) as response:
                 logger.info(response.status)
                 if response.status == 200:
