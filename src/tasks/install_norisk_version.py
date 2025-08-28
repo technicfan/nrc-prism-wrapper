@@ -5,6 +5,9 @@ import hashlib
 import json
 import logging
 import os
+
+import duckdb
+import config
 from pathlib import Path
 from urllib.parse import urljoin
 import networking.api as api
@@ -40,11 +43,17 @@ async def get_mc_version():
     Returns:
         minecraft_version:str
     '''
-    with open("../mmc-pack.json") as f:
-        mmc_pack = json.load(f)
-        for component in mmc_pack.get("components"):
-            if component.get("uid") == "net.minecraft":
-                return component.get("version")
+    if config.LAUNCHER == "prism":
+        with open("../mmc-pack.json") as f:
+            mmc_pack = json.load(f)
+            for component in mmc_pack.get("components"):
+                if component.get("uid") == "net.minecraft":
+                    return component.get("version")
+    else:
+        data = duckdb.connect("../../app.db",read_only=True)
+        # fuck you
+        data = data.sql(f"SELECT game_version FROM profiles where path = \"{Path(os.getcwd()).name}\"").fetchall()
+        return data[0][0]
     
 
 async def download_jar(url,filename,version:str,ID:str, old_file=None):

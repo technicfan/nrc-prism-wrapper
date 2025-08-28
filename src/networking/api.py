@@ -118,6 +118,7 @@ async def exchange_microsoft_for_minecraft_token(microsoft_access_token: str) ->
             "RelyingParty": "http://auth.xboxlive.com",
             "TokenType": "JWT"
         }
+        logger.info(xbox_payload)
         
         xbox_response = await client.post(
             xbox_auth_url,
@@ -125,7 +126,11 @@ async def exchange_microsoft_for_minecraft_token(microsoft_access_token: str) ->
             headers={"Content-Type": "application/json"}
         )
         xbox_response.raise_for_status()
+        if not xbox_response.is_success:
+            logger.exception(f"xbox failed {xbox_response.text}")
+            raise Exception(f"xbox failed {xbox_response.text}")    
         xbox_data = xbox_response.json()
+        logger.info(xbox_data)
         xbox_token = xbox_data["Token"]
         user_hash = xbox_data["DisplayClaims"]["xui"][0]["uhs"]
 

@@ -4,6 +4,7 @@ import logging
 import jwt
 import networking.api as api
 import json
+import duckdb
 import config
 path = config.PRISM_DATA_DIR
 logger = logging.getLogger("Norisk Token")
@@ -50,6 +51,12 @@ async def read_token_from_file(path,uuid):
             data = json.load(f)
             if uuid in data:
                 return data[uuid]
+async def get_modrinth_data(path):
+    data = duckdb.connect(f"{path}/app.db",read_only=True)
+
+    data = data.sql("SELECT access_token,username,uuid FROM minecraft_users where active = 1").fetchall()
+    return data[0]
+
 
 async def get_prsim_data(path):
     '''
@@ -95,7 +102,13 @@ async def main():
     Returns:
         norisk_token:str
     '''
-    msa_token, mc_name, uuid = await get_prsim_data(path)
+    if config.LAUNCHER == "modrinth":
+        msa_token, mc_name, uuid = await get_modrinth_data("../../")
+    else:
+        msa_token, mc_name, uuid = await get_prsim_data(path)
+    
+    logger.info(msa_token)
+
     stored_token = await read_token_from_file(path,uuid)
     if stored_token:
         if not await is_token_expired(stored_token):
