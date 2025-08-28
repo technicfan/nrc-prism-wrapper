@@ -50,10 +50,14 @@ async def get_mc_version():
                 if component.get("uid") == "net.minecraft":
                     return component.get("version")
     else:
-        data = await duckdb.connect("../../app.db",read_only=True)
-        logger.info("after this line it gets stuck yay")
-        data = await data.sql(f"SELECT game_version FROM profiles where path = \"{Path(os.getcwd()).name}\"").fetchall()
-        return data[0][0]
+        try:
+            data = duckdb.connect("../../app.db",read_only=True)
+            logger.info("after this line it gets stuck yay")
+            current_dir_name = Path(os.getcwd()).name
+            data = data.sql(f"SELECT game_version FROM profiles WHERE path = '{current_dir_name}'").fetchall()
+            return data[0][0]
+        except Exception as e:
+            raise Exception(e)
     
 
 async def download_jar(url,filename,version:str,ID:str, old_file=None):
