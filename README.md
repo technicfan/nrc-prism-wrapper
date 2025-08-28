@@ -11,7 +11,7 @@
 - python 3.x+
 - [Required Python packages](https://github.com/ThatCuteOne/nrc-prism-wrapper/blob/master/req.txt)(should be installed automatically)
 
-On some systems(debain based for example) you may need to install the dependencies manually, just look at the [req.txt]((https://github.com/ThatCuteOne/nrc-prism-wrapper/blob/master/req.txt) or the [get_dependencies.py](https://github.com/ThatCuteOne/nrc-prism-wrapper/blob/master/src/tasks/get_dependencies.py)
+On some systems(debain based for example) you may need to install the dependencies manually, just look at the [req.txt](https://github.com/ThatCuteOne/nrc-prism-wrapper/blob/master/req.txt) or the [get_dependencies.py](https://github.com/ThatCuteOne/nrc-prism-wrapper/blob/master/src/tasks/get_dependencies.py)
 
 
 # Usage
