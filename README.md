@@ -7,22 +7,30 @@
 - Run [Norisk Client](https://norisk.gg/) trough prism launcher
 - remove norisk client watermark
 
+## Requirements:
+- python 3.x+
+- [Required Python packages](https://github.com/ThatCuteOne/nrc-prism-wrapper/blob/master/req.txt)(should be installed automatically)
+
+On some systems(debain based for example) you may need to install the dependencies manually, just look at the [req.txt]((https://github.com/ThatCuteOne/nrc-prism-wrapper/blob/master/req.txt)) or the [get_dependencies.py](https://github.com/ThatCuteOne/nrc-prism-wrapper/blob/master/src/tasks/get_dependencies.py)
+
 
 # Usage
 1. You need to have logged into the default NRC(Norisk Client) Launcher at least once.
+2. Download the nrc-wrapper.pyz from the releases page
 2. Go into Prism(multimc may also work) edit an instance, go to **Settings>Custom Commands**
-3. Enter The path to wrapper.py on your pc(on linux you may have to add execute perms)
+3. In "Wrapper command" Enter:
+```
+python path/to/nrc-wrapper.pyz
+```
 4. Start your instance
 everything else should happen automaticaly
 
-On some systems you may need to install the dependencies manually, just look at the req.txt or the get_dependencies.py
 
 _NOTE: Currently only the fabric versions are supported(1.21+)_
 
 ### Todos
 - set modloader version
 - handle assets other then prod
-- build into a single binary
 - verfiy downloads by hash matching with maven repo(http://maven.norisk.gg/repository/norisk-production/gg/norisk/nrc-ui/1.0.78+fabric.1.21.7/nrc-ui-1.0.78+fabric.1.21.7.jar.md5/sha1/sha257/sha512) and modrinth
 - force newest setting(force install newest versions from maven repo or modrinth)
 - full resourcepack override support
