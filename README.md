@@ -4,7 +4,7 @@
 > **Attention:** There may be security issues since i dont know anything about security, so i cant guarantee any.
 
 # Features
-- Run [Norisk Client](https://norisk.gg/) trough prism launcher
+- Run [Norisk Client](https://norisk.gg/) trough prism launcher or the modrinth app
 - remove norisk client watermark
 
 ## Requirements:
@@ -29,6 +29,7 @@ everything else should happen automaticaly
 _NOTE: Currently only the fabric versions are supported(1.21+)_
 
 ### Todos
+- log steaming into modrinth app(if possible)
 - set modloader version
 - handle assets other then prod
 - verfiy downloads by hash matching with maven repo(http://maven.norisk.gg/repository/norisk-production/gg/norisk/nrc-ui/1.0.78+fabric.1.21.7/nrc-ui-1.0.78+fabric.1.21.7.jar.md5/sha1/sha257/sha512) and modrinth

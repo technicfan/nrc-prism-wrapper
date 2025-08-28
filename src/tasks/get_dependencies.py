@@ -14,7 +14,8 @@ REQUIRED_PACKAGES = [
     'json5',
     'aiohttp',
     'requests',
-    'tenacity'
+    'tenacity',
+    'duckdb'
     ]
 
 

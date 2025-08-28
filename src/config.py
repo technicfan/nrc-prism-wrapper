@@ -31,6 +31,10 @@ def get_config():
 
     return config
 
+if Path("../../app.db").is_file():
+    LAUNCHER = "modrinth"
+else:
+    LAUNCHER = "prism"
 
 c = get_config()
 

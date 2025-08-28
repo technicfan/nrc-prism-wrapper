@@ -8,3 +8,4 @@ aiohttp
 json5
 requests
 tenacity
+duckdb
