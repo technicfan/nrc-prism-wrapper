@@ -5,6 +5,9 @@ import hashlib
 import json
 import logging
 import os
+
+import duckdb
+import config
 from pathlib import Path
 from urllib.parse import urljoin
 import networking.api as api
@@ -40,11 +43,20 @@ async def get_mc_version():
     Returns:
         minecraft_version:str
     '''
-    with open("../mmc-pack.json") as f:
-        mmc_pack = json.load(f)
-        for component in mmc_pack.get("components"):
-            if component.get("uid") == "net.minecraft":
-                return component.get("version")
+    if config.LAUNCHER == "prism":
+        with open("../mmc-pack.json") as f:
+            mmc_pack = json.load(f)
+            for component in mmc_pack.get("components"):
+                if component.get("uid") == "net.minecraft":
+                    return component.get("version")
+    else:
+        try:
+            data = duckdb.connect("../../app.db",read_only=True)
+            current_dir_name = Path(os.getcwd()).name
+            data = data.sql(f"SELECT game_version FROM profiles WHERE path = '{current_dir_name}'").fetchall()
+            return data[0][0]
+        except Exception as e:
+            raise Exception(e)
     
 
 async def download_jar(url,filename,version:str,ID:str, old_file=None):
@@ -65,7 +77,7 @@ async def download_jar(url,filename,version:str,ID:str, old_file=None):
     '''
 
     a = await api.download_jar(url,filename)
-    if a != old_file and a != None and old_file != None:
+    if a != old_file and a is not None and old_file is not None:
         os.remove(f"./mods/{old_file}")
     # stuffs thats written to index
     return {
@@ -222,6 +234,7 @@ async def main():
     Verifys and installs mod jars
     '''
     mc_version = await get_mc_version()
+    logger.info("getting jars")
     mods,repos = await get_compatible_nrc_mods(mc_version)
     installed_mods = await get_installed_versions()
 

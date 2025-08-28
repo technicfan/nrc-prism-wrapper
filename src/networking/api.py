@@ -6,13 +6,13 @@ from pathlib import Path
 import platform
 from typing import Dict
 import uuid
+import aiofiles
+import aiohttp
+import httpx
 
 
 logger = logging.getLogger("Minecraft/Norisk API")
 
-import aiofiles
-import aiohttp
-import httpx
 ASSET_PATH = "NoRiskClient/assets"
 MOJANG_SESSION_URL = "https://sessionserver.mojang.com"
 NORISK_API_URL = "https://api.norisk.gg/api/v1"
@@ -80,104 +80,29 @@ async def download_single_asset(asset_id: str, path: str, asset_info: Dict,noris
 
 
 
-async def get_asset_metadata(nrc_token,asset_id):
+async def get_asset_metadata(asset_id):
     url = f"https://api.norisk.gg/api/v1/launcher/pack/{asset_id}"
-    headers = {
-            "Authorization": f"Bearer {nrc_token}",
-            "Content-Type": "application/json"
-        }
     async with aiohttp.ClientSession() as session:
         try:
-            async with session.get(url, headers=headers) as response:
+            async with session.get(url) as response:
+                logger.info(response.status)
                 if response.status == 200:
                     return await response.json()
                 else:
-                    print(f"Failed to fetch assets: {response.status}")
+                    logger.warning(f"Failed to fetch assets: {response.status}")
                     return {}
         except Exception as e:
-            print(f"Error fetching assets: {e}")
+            logger.exception(f"Error fetching assets: {e}")
             return {}
-
-async def exchange_microsoft_for_minecraft_token(microsoft_access_token: str) -> tuple[str, str]:
-    """
-    Exchange Microsoft access token for Minecraft access token and profile UUID
-    
-    Returns:
-        tuple: (minecraft_access_token, player_uuid)
-    """
-    async with httpx.AsyncClient() as client:
-        # Step 1: Authenticate with Xbox Live
-        xbox_auth_url = "https://user.auth.xboxlive.com/user/authenticate"
-        
-        xbox_payload = {
-            "Properties": {
-                "AuthMethod": "RPS",
-                "SiteName": "user.auth.xboxlive.com",
-                "RpsTicket": f"d={microsoft_access_token}"
-            },
-            "RelyingParty": "http://auth.xboxlive.com",
-            "TokenType": "JWT"
-        }
-        
-        xbox_response = await client.post(
-            xbox_auth_url,
-            json=xbox_payload,
-            headers={"Content-Type": "application/json"}
-        )
-        xbox_response.raise_for_status()
-        xbox_data = xbox_response.json()
-        xbox_token = xbox_data["Token"]
-        user_hash = xbox_data["DisplayClaims"]["xui"][0]["uhs"]
-
-        # Step 2: Get XSTS token (Xbox Secure Token Service)
-        xsts_url = "https://xsts.auth.xboxlive.com/xsts/authorize"
-        
-        xsts_payload = {
-            "Properties": {
-                "SandboxId": "RETAIL",
-                "UserTokens": [xbox_token]
-            },
-            "RelyingParty": "rp://api.minecraftservices.com/",
-            "TokenType": "JWT"
-        }
-        
-        xsts_response = await client.post(
-            xsts_url,
-            json=xsts_payload,
-            headers={"Content-Type": "application/json"}
-        )
-        xsts_response.raise_for_status()
-        xsts_data = xsts_response.json()
-        xsts_token = xsts_data["Token"]
-
-        # Step 3: Authenticate with Minecraft Services
-        mc_auth_url = "https://api.minecraftservices.com/authentication/login_with_xbox"
-        
-        mc_payload = {
-            "identityToken": f"XBL3.0 x={user_hash};{xsts_token}"
-        }
-        
-        mc_response = await client.post(
-            mc_auth_url,
-            json=mc_payload,
-            headers={"Content-Type": "application/json"}
-        )
-        mc_response.raise_for_status()
-        mc_data = mc_response.json()
-        minecraft_access_token = mc_data["access_token"]
-
-        # Step 4: Get Minecraft profile (to get UUID)
-        profile_url = "https://api.minecraftservices.com/minecraft/profile"
-        
-        profile_response = await client.get(
-            profile_url,
-            headers={"Authorization": f"Bearer {minecraft_access_token}"}
-        )
-        profile_response.raise_for_status()
-        profile_data = profile_response.json()
-        player_uuid = profile_data["id"]
-
-        return minecraft_access_token, player_uuid
+        except asyncio.TimeoutError:
+            logger.error("Request timed out")
+            return {}
+        except aiohttp.ClientError as e:
+            logger.exception(f"HTTP client error: {e}")
+            return {}
+        except Exception as e:
+            logger.exception(f"Unexpected error: {e}")
+            return {}
 
 async def validate_with_norisk_api(username,server_id):
     url = f"{NORISK_API_URL}/launcher/auth/validate/v2"
