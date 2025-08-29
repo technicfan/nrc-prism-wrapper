@@ -1,8 +1,10 @@
 accounts.json
 *__pycache__*
 mods
-NoRiskClient/*
+NoRiskClient
 .nrc-index.json
-config.jsonc
 nrc-wrapper.pyz
 build
+norisk_data.json
+app.*
+config.jsonc

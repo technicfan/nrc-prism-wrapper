@@ -1,5 +1,4 @@
 import asyncio
-from asyncio.log import logger
 from dataclasses import dataclass
 import hashlib
 import json
@@ -12,6 +11,9 @@ from pathlib import Path
 from urllib.parse import urljoin
 import networking.api as api
 import networking.modrinth_api as modrinth
+
+logger = logging.getLogger("Jars Geatherer")
+
 
 @dataclass
 class ModEntry():
@@ -51,7 +53,7 @@ async def get_mc_version():
                     return component.get("version")
     else:
         try:
-            data = duckdb.connect("../../app.db",read_only=True)
+            data = duckdb.connect(config.MODRINTH_DATA_PATH,read_only=True)
             current_dir_name = Path(os.getcwd()).name
             data = data.sql(f"SELECT game_version FROM profiles WHERE path = '{current_dir_name}'").fetchall()
             return data[0][0]
@@ -283,4 +285,3 @@ async def main():
     else:
         logger.info("No Jars need to be downloaded")
 
-logger = logging.getLogger("Jars Geatherer")
